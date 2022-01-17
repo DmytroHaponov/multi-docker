@@ -1,3 +1,5 @@
+language: generic
+
 sudo: required
 services:
   - docker
@@ -5,7 +7,7 @@ before_install:
   - docker build -t dhaponov/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true USERNAME/react-test npm test
+  - docker run -e CI=true dhaponov/react-test npm test
 
 after_success:
   - docker build -t dhaponov/multi-client ./client
