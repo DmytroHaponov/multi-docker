@@ -18,9 +18,9 @@ after_success:
 # take these images and push them to docker-hub
 
 # for this need to log in to the docker CLI:
-- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
 
-- docker push dhaponov/multi-client
-- docker push dhaponov/multi-nginx
-- docker push dhaponov/multi-server
-- docker push dhaponov/multi-worker
+  - docker push dhaponov/multi-client
+  - docker push dhaponov/multi-nginx
+  - docker push dhaponov/multi-server
+  - docker push dhaponov/multi-worker
