@@ -1,0 +1,59 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  #these service names can also be considered as "domains"/url addresses
+  redis:
+    image: 'redis:latest'
+  #no matter how exactly call it - 
+  nginx:
+    restart: always
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+    # 3050 on PC, taken just for e.g.
+      - '3050:80'
+  #used to call it "server", then renamed in order to prevent conflict with nginx
+  api: 
+    build:
+    #do not specify folder here! for this "context:" is used
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      # inside the container do not override this folder, leave it as is 
+      - /app/node_modules
+      # ./server is copied to /app, then 
+      - ./server:/app
+      # so anytime application tries to access anything inside /app (except /node_modules) -
+      # it's redirected to /server of current project folder
+      # such changes in /server are automatically reflected in /app of container
+    environment:
+    # takes data from process above - "redis:"
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
